@@ -1,0 +1,24 @@
+// Create orc table for hvac and buildings
+CREATE TABLE hvac STORED AS ORC AS SELECT * FROM hvac_raw;
+CREATE TABLE buildings STORED AS ORC AS SELECT * FROM building_raw;
+
+
+//Reduce heating and cooling expenses.
+//Keep indoor temperatures in a comfortable range between 65-70 degrees.
+//Identify which HVAC products are reliable, and replace unreliable equipment with those models.
+//First, we will identify whether the actual temperature was more than five degrees different from the target temperature.
+CREATE TABLE hvac_temperatures as 
+select *, targettemp - actualtemp as temp_diff, 
+IF((targettemp - actualtemp) > 5, 'COLD', 
+IF((targettemp - actualtemp) < -5, 'HOT', 'NORMAL')) 
+AS temprange, 
+IF((targettemp - actualtemp) > 5, '1', 
+IF((targettemp - actualtemp) < -5, '1', 0)) 
+AS extremetemp from hvac;
+
+
+
+// combine the hvac and hvac_temperatures data sets
+create table if not exists hvac_building 
+as select h.*, b.country, b.hvacproduct, b.buildingage, b.buildingmgr 
+from buildings b join hvac_temperatures h on b.buildingid = h.buildingid;

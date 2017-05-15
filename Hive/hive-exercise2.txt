@@ -1,0 +1,38 @@
+//Get file from GitHub
+wget https://github.com/ywchiu/micronbigdata/raw/master/Hive/purchase_view.tab
+wget https://github.com/ywchiu/micronbigdata/raw/master/Hive/purchase_order.tab
+
+//Create costumer database
+mysql -e 'create database costumer' 
+
+//Create tables
+wget https://github.com/ywchiu/micronbigdata/raw/master/Hive/create_tb.sql
+mysql -uroot costumer< create_tb.sql
+
+//Import finance.csv into MajorTrade
+mysql costumer -e "LOAD DATA LOCAL INFILE 'purchase_order.tab' INTO TABLE costumer_order FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' (Time,Action,User,Product, Quantity,Price)"
+mysql costumer -e "LOAD DATA LOCAL INFILE 'purchase_view.tab' INTO TABLE costumer_view FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' (Time,Action,User,Product)"
+
+//Using sqoop to import data
+sqoop import --connect jdbc:mysql://localhost:3306/costumer -username root --query "select * from costumer_order where 1=1 and \$CONDITIONS" --hive-table costumer_order --create-hive-table --hive-import --hive-home /apps/hive/warehouse -m1 --target-dir costumer_order  --driver com.mysql.jdbc.Driver
+sqoop import --connect jdbc:mysql://localhost:3306/costumer -username root --query "select * from costumer_view where 1=1 and \$CONDITIONS limit 20000" --hive-table costumer_view --create-hive-table --hive-import --hive-home /apps/hive/warehouse -m1 --target-dir costumer_view  --driver com.mysql.jdbc.Driver
+
+//Entering hive
+hive
+
+//Making queries
+create table user_product_cnt as 
+select `user`, count(`product`), 1 from costumer_order group by `user`;
+
+create table user_view_cnt as 
+select `user`, count(`product`) from costumer_view group by `user`;
+
+
+create table user_behavior as 
+select user_product_cnt.`user`, user_product_cnt.`_c1` as buycnt ,
+user_view_cnt.`_c1` as viewcnt  from user_product_cnt inner join
+user_view_cnt on user_product_cnt.`user` = user_view_cnt.`user`;
+
+
+//Using sqoop to export data back to mysql
+sqoop export --connect jdbc:mysql://localhost:3306/costumer --table costumer_behavior --export-dir /apps/hive/warehouse/user_behavior --username root -m1 --input-fields-terminated-by '\001' --driver com.mysql.jdbc.Driver

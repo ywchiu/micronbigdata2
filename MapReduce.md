@@ -1,0 +1,6 @@
+- wget https://github.com/ywchiu/micronbigdata/raw/master/MapReduce/WordCount.java
+- export CLASSPATH=/usr/hdp/2.4.0.0-169/hadoop/hadoop-common.jar:/usr/hdp/2.4.0.0-169/hadoop/client/hadoop-mapreduce-client-core.jar
+- mkdir wordcount_classes
+- javac -d wordcount_classes WordCount.java
+- jar -cvf wordcount.jar -C wordcount_classes/ ./
+- yarn jar wordcount.jar org.myorg.WordCount /tmp/wc.txt /tmp/out
