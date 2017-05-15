@@ -4,6 +4,17 @@
 - 23.99.57.243
 - hdp / MiCr@NLargitData
 
+## 登入到ssh
+ssh root@127.0.0.1 -p 2222
+
+## 登入Ambari
+- http://23.99.57.243:8080/#/main/dashboard/metrics
+- admin/hadoop
+
+
+## 下載Pietty
+- https://sites.google.com/view/pietty-project/download?authuser=0
+
 ## MapReduce 範例
 - https://github.com/ywchiu/micronbigdata/blob/master/MapReduce.md
 
