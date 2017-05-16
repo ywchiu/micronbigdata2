@@ -1,7 +1,7 @@
 # Big Data Analytics
 
 ## Sandbox 主機
-- 23.99.57.243
+- 40.118.166.239
 - hdp / MiCr@NLargitData
 
 ## 登入到ssh
