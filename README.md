@@ -1,14 +1,14 @@
 # Big Data Analytics
 
 ## Sandbox 主機
-- 52.160.96.155
+- 13.93.153.233
 - hdp / MiCr@NLargitData
 
 ## 登入到ssh
 ssh root@127.0.0.1 -p 2222
 
 ## 登入Ambari
-- http://52.160.96.155:8080/#/main/dashboard/metrics
+- http://13.93.153.233:8080/#/main/dashboard/metrics
 - admin/hadoop
 
 
