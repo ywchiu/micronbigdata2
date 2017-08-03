@@ -10,8 +10,11 @@ unzip 2014.zip
 //Create directory, data
 hadoop fs -mkdir /tmp/data
 
+// Merge File
+cat 2014/*.op > weather.op
+
 //Upload 2014 data folder
-hadoop fs -put 2014 /tmp 
+hadoop fs -put weather.op /tmp 
 
 // Use pig:
 pig
