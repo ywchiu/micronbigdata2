@@ -20,7 +20,7 @@ hadoop fs -put weather.op /tmp
 pig
 
 //Load temperature data from HDFS
-allDataWithHeaders = LOAD '/tmp/2014/*.op' AS (row:chararray);
+allDataWithHeaders = LOAD '/tmp/weather.op' AS (row:chararray);
 
 //Transform Data
 dataOnly = FILTER allDataWithHeaders BY SIZE(row) > 108L;
@@ -36,14 +36,14 @@ selectColumns = FOREACH dataOnly GENERATE
 
 //Clean Data
 hasAllData = FILTER selectColumns by temp_avg < 900.0 AND temp_max < 900.0 AND temp_min < 900.0 AND windspeed_avg < 900.0 AND windspeed_max < 900.0;
-STORE hasAllData INTO 'data/gsod-filtered';
+STORE hasAllData INTO '/tmp/data/gsod-filtered';
 
 //Sampling 10% data from dataset
 sampleOnePercent = SAMPLE selectColumns 0.01;
-STORE sampleOnePercent INTO 'data/gsod-one-pct';
+STORE sampleOnePercent INTO '/tmp/data/gsod-one-pct';
 
 //Order data by temperature
-allData = LOAD 'data/gsod-filtered' USING PigStorage('\t') AS (station:int,wban:int,ymd:int,temp_avg:float,temp_max:float,temp_min:float,windspeed_avg:float,windspeed_max:float);
+allData = LOAD '/tmp/data/gsod-filtered' USING PigStorage('\t') AS (station:int,wban:int,ymd:int,temp_avg:float,temp_max:float,temp_min:float,windspeed_avg:float,windspeed_max:float);
 hottest = ORDER allData BY $4 DESC;
 maxTemps = LIMIT hottest 10;
 dump maxTemps;
@@ -52,10 +52,10 @@ dump maxTemps;
 wget https://github.com/ywchiu/hadoopiii2/raw/master/Pig/ISH-HISTORY.tsv
 
 //Upload ISH-HISTORY.tsv to HDFS
-hadoop fs -put ISH-HISTORY.tsv /user/cloudera/
+hadoop fs -put ISH-HISTORY.tsv /tmp/
 
 //Merge station name with join 
-stations = LOAD 'ISH-HISTORY.tsv' USING PigStorage('\t') AS (station:int,wban:int,station_name:chararray,country:chararray,state:chararray);
+stations = LOAD '/tmp/ISH-HISTORY.tsv' USING PigStorage('\t') AS (station:int,wban:int,station_name:chararray,country:chararray,state:chararray);
 joined = JOIN maxTemps BY (station,wban), stations BY (station,wban);
 ordered = ORDER joined BY $4 DESC;
 DUMP ordered;
