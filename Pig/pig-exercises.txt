@@ -1,20 +1,23 @@
 //Retrieve temperature data from GitHub
 wget https://github.com/ywchiu/hadoopiii2/raw/master/Pig/2014.zip
 
+// get zip file from HDFS
+hadoop fs -get /tmp/2014.zip ./
+
 //Unzip data file
 unzip 2014.zip
 
 //Create directory, data
-hadoop fs -mkdir data
+hadoop fs -mkdir /tmp/data
 
 //Upload 2014 data folder
-hadoop fs -put 2014 /user/cloudera 
+hadoop fs -put 2014 /tmp 
 
 // Use pig:
 pig
 
 //Load temperature data from HDFS
-allDataWithHeaders = LOAD '/user/cloudera/2014/*.op' AS (row:chararray);
+allDataWithHeaders = LOAD '/tmp/2014/*.op' AS (row:chararray);
 
 //Transform Data
 dataOnly = FILTER allDataWithHeaders BY SIZE(row) > 108L;
