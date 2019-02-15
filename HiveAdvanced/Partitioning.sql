@@ -5,7 +5,7 @@ CREATE TABLE Sales_Data_date_partition
 (
 StoreLocation VARCHAR(30),
 Product VARCHAR(30),
-Revenue DECIMAL(10,2) partitioned by (OrderDate DATE);
+Revenue DECIMAL(10,2)) partitioned by (OrderDate DATE);
 
 
 Insert into Sales_Data_date_partition partition  (OrderDate ='2016-01-16')
